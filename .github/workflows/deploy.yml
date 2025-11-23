@@ -1,0 +1,39 @@
+name: Deploy Cloud Function
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout code
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # 2. Authenticate to GCP
+      - name: Set up GCP credentials
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.key1 }}
+
+      # 3. Install gcloud CLI
+      - name: Install gcloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: project6174
+          service_account_email: github-ci-functions@project6174.iam.gserviceaccount.com
+
+      # 4. Deploy Cloud Function
+      - name: Deploy Cloud Function
+        run: |
+          gcloud functions deploy fun2 \
+            --runtime=python310 \
+            --trigger-topic=topic1 \
+            --entry-point=function1 \
+            --region=us-central1 \
+            --memory=512MB \
+            --timeout=120s
+            --verbosity=debug
